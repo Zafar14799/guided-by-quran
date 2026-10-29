@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en" class="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Guided By Quran - Your Islamic Companion</title>
+<meta name="description" content="Prayer times, Quran reader, duas, tasbih counter and Qibla finder.">
+<meta name="theme-color" content="#0f5132">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<script src="https://cdn.tailwindcss.com/3.4.17"></script>
+<script>tailwind.config={darkMode:'class',theme:{extend:{colors:{emerald:{50:'#f0fdf4',100:'#dcfce7',700:'#15803d',800:'#166534',900:'#0f5132',950:'#064e3b'}},fontFamily:{sans:['Inter','sans-serif'],arabic:['Amiri','serif']}}}}</script>
+<link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/lucide@0.469.0/dist/umd/lucide.min.js"></script>
+<style>
+.font-arabic{font-family:'Amiri',serif}
+body{padding-bottom:calc(4.5rem + env(safe-area-inset-bottom))}
+header{padding-top:env(safe-area-inset-top)}
+nav{padding-bottom:env(safe-area-inset-bottom)}
+button:focus-visible,input:focus-visible{outline:2px solid #f59e0b;outline-offset:2px}
+</style>
+</head>
+<body class="bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 font-sans transition-colors min-h-screen">
+
+<header class="sticky top-0 z-40 bg-emerald-900 text-white shadow-md">
+ <div class="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between">
+  <div class="flex items-center gap-3">
+   <div class="w-11 h-11 rounded-full bg-amber-500/20 border-2 border-amber-400 flex items-center justify-center text-xl">📖</div>
+   <div>
+    <h1 class="font-bold text-lg leading-none text-amber-400">Guided By Quran</h1>
+    <p class="text-xs text-emerald-100 flex items-center gap-1 mt-1"><i data-lucide="map-pin" class="w-3 h-3"></i><span id="loc">Bengaluru, India</span></p>
+   </div>
+  </div>
+  <div class="flex items-center gap-3">
+   <button id="install" class="hidden text-xs font-semibold px-3 py-1.5 rounded-full bg-amber-400 text-emerald-950">Install app</button>
+   <div class="text-right hidden sm:block">
+    <p class="text-sm font-semibold text-amber-300" id="hijri">&nbsp;</p>
+    <p class="text-xs text-emerald-100" id="greg"></p>
+   </div>
+   <button id="theme" class="p-2 rounded-full hover:bg-emerald-800" aria-label="Toggle dark mode"><i data-lucide="moon" class="w-5 h-5 dark:hidden"></i><i data-lucide="sun" class="w-5 h-5 hidden dark:block text-amber-400"></i></button>
+  </div>
+ </div>
+</header>
+
+<main class="max-w-5xl mx-auto w-full px-4 py-5">
+
+<!-- TODAY -->
+<section id="tab-today" class="tab space-y-5">
+ <div class="bg-gradient-to-br from-emerald-800 via-emerald-800 to-emerald-950 rounded-3xl p-6 text-white shadow-lg">
+  <div class="flex items-start justify-between gap-4 mb-5">
+   <div>
+    <span class="inline-block px-3 py-1 text-sm rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30 font-medium">Next Prayer</span>
+    <h2 class="text-3xl font-bold mt-3 flex items-baseline gap-2"><span id="np-name">--</span><span class="text-base font-normal text-emerald-200" id="np-time"></span></h2>
+   </div>
+   <div class="text-right">
+    <p class="text-sm text-emerald-200">Time Remaining</p>
+    <p class="text-3xl sm:text-4xl font-mono font-bold text-amber-400 mt-1" id="count">--:--:--</p>
+   </div>
+  </div>
+  <div id="prayers" class="grid grid-cols-5 gap-2 pt-4 border-t border-emerald-600/50 text-center"></div>
+  <p id="pt-msg" class="text-xs text-emerald-200 mt-3 hidden"></p>
+ </div>
+
+ <div class="bg-white dark:bg-slate-900 rounded-3xl p-6 shadow-sm border border-slate-200 dark:border-slate-800 space-y-4">
+  <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+   <span class="text-sm font-bold text-emerald-700 dark:text-emerald-400 flex items-center gap-2"><i data-lucide="book-open" class="w-5 h-5"></i>AYAH OF THE DAY</span>
+   <span class="text-sm text-slate-500 dark:text-slate-400" id="ay-ref"></span>
+  </div>
+  <p class="text-right font-arabic text-3xl sm:text-4xl leading-loose" dir="rtl" id="ay-ar"></p>
+  <p class="italic text-slate-600 dark:text-slate-300" id="ay-tr"></p>
+  <p class="font-medium" id="ay-en"></p>
+  <div class="p-4 bg-emerald-50 dark:bg-emerald-950/40 rounded-xl border border-emerald-100 dark:border-emerald-900/40 text-emerald-800 dark:text-emerald-300 text-sm"><strong>Reflection:</strong> <span id="ay-re"></span></div>
+ </div>
+
+ <div class="grid grid-cols-2 gap-4">
+  <button onclick="go('tasbih')" class="p-4 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 flex items-center gap-4 text-left hover:border-emerald-600 transition">
+   <div class="p-4 rounded-xl bg-amber-100 dark:bg-amber-950/50 text-amber-600"><i data-lucide="disc" class="w-6 h-6"></i></div>
+   <div><h4 class="font-bold">Tasbih Counter</h4><p class="text-sm text-slate-500 dark:text-slate-400">Digital Dhikr</p></div>
+  </button>
+  <button onclick="go('qibla')" class="p-4 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 flex items-center gap-4 text-left hover:border-emerald-600 transition">
+   <div class="p-4 rounded-xl bg-emerald-100 dark:bg-emerald-950/50 text-emerald-700"><i data-lucide="compass" class="w-6 h-6"></i></div>
+   <div><h4 class="font-bold">Qibla Finder</h4><p class="text-sm text-slate-500 dark:text-slate-400">Direction to Kaaba</p></div>
+  </button>
+ </div>
+
+ <div class="space-y-3">
+  <h3 class="font-bold text-lg text-slate-700 dark:text-slate-300 tracking-wide">QURANIC GUIDANCE &amp; ARTICLES</h3>
+  <div class="grid sm:grid-cols-2 gap-4" id="articles"></div>
+ </div>
+</section>
+
+<!-- QURAN -->
+<section id="tab-quran" class="tab hidden space-y-4">
+ <div id="q-list-view" class="space-y-4">
+  <div class="relative"><i data-lucide="search" class="w-4 h-4 absolute left-3 top-3.5 text-slate-400"></i>
+   <input id="q-search" type="search" placeholder="Search surah by name or number" class="w-full pl-9 pr-4 py-3 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 text-sm"></div>
+  <div id="surah-list" class="grid sm:grid-cols-2 gap-2"></div>
+ </div>
+ <div id="q-read" class="hidden bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 space-y-4">
+  <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3 gap-2">
+   <button onclick="closeSurah()" class="flex items-center text-sm font-semibold text-emerald-700 dark:text-emerald-400"><i data-lucide="arrow-left" class="w-4 h-4 mr-1"></i>All surahs</button>
+   <h3 id="s-title" class="font-bold text-center"></h3>
+   <div class="flex items-center gap-1">
+    <button onclick="fontSize(-2)" class="px-2 py-1 bg-slate-100 dark:bg-slate-800 rounded text-sm" aria-label="Smaller text">A-</button>
+    <button onclick="fontSize(2)" class="px-2 py-1 bg-slate-100 dark:bg-slate-800 rounded text-sm" aria-label="Larger text">A+</button>
+    <button id="audio-btn" onclick="toggleAudio()" class="p-2 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300" aria-label="Play recitation"><i data-lucide="play" class="w-4 h-4"></i></button>
+   </div>
+  </div>
+  <div id="verses" class="space-y-4"></div>
+ </div>
+</section>
+
+<!-- DUAS -->
+<section id="tab-duas" class="tab hidden space-y-3">
+ <h3 class="text-lg font-bold">Duas &amp; Adhkar</h3>
+ <div id="duas" class="space-y-3"></div>
+</section>
+
+<!-- TASBIH -->
+<section id="tab-tasbih" class="tab hidden">
+ <div class="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200 dark:border-slate-800 max-w-sm mx-auto space-y-5 text-center">
+  <h3 class="text-lg font-bold">Tasbih Counter</h3>
+  <div class="flex flex-wrap justify-center gap-2 text-xs" id="dhikr-chips"></div>
+  <div class="py-6 bg-emerald-900 rounded-2xl text-white">
+   <p class="font-arabic text-2xl text-amber-300" id="t-ar"></p>
+   <p class="text-6xl font-mono font-bold text-amber-400 my-2" id="t-count">0</p>
+   <p class="text-sm text-emerald-200" id="t-target"></p>
+   <div class="h-1.5 bg-emerald-950 rounded-full mx-6 mt-3 overflow-hidden"><div id="t-bar" class="h-full bg-amber-400 transition-all" style="width:0"></div></div>
+  </div>
+  <div class="flex justify-center items-center gap-5">
+   <button onclick="resetTasbih()" class="p-3 bg-slate-100 dark:bg-slate-800 rounded-full hover:text-red-600" aria-label="Reset"><i data-lucide="rotate-ccw" class="w-5 h-5"></i></button>
+   <button onclick="tap()" class="w-28 h-28 rounded-full bg-emerald-800 hover:bg-emerald-700 text-white font-bold text-xl shadow-lg border-4 border-amber-400 active:scale-95 transition">TAP</button>
+  </div>
+ </div>
+</section>
+
+<!-- QIBLA -->
+<section id="tab-qibla" class="tab hidden">
+ <div class="bg-white dark:bg-slate-900 p-6 rounded-3xl border border-slate-200 dark:border-slate-800 max-w-sm mx-auto space-y-4 text-center">
+  <h3 class="text-lg font-bold">Qibla Direction</h3>
+  <div class="relative w-64 h-64 mx-auto">
+   <div id="dial" class="absolute inset-0 rounded-full border-4 border-emerald-800 bg-slate-50 dark:bg-slate-950 transition-transform duration-200">
+    <span class="absolute top-2 left-1/2 -translate-x-1/2 text-xs font-bold text-red-500">N</span>
+    <span class="absolute right-2 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400">E</span>
+    <span class="absolute bottom-2 left-1/2 -translate-x-1/2 text-xs font-bold text-slate-400">S</span>
+    <span class="absolute left-2 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400">W</span>
+    <div id="needle" class="absolute inset-0 transition-transform duration-200"><div class="flex flex-col items-center pt-7"><span class="text-2xl">🕋</span><div class="w-1 h-20 bg-amber-500 rounded-full"></div></div></div>
+   </div>
+  </div>
+  <div class="p-3 bg-emerald-50 dark:bg-emerald-950/40 rounded-xl text-sm text-emerald-800 dark:text-emerald-300">Qibla bearing: <strong id="q-deg">--</strong> from true north</div>
+  <button id="compass-btn" onclick="startCompass()" class="px-4 py-2 rounded-full bg-emerald-800 text-white text-sm font-semibold">Use live compass</button>
+  <p class="text-xs text-slate-500 dark:text-slate-400" id="q-note">Without the live compass, point your phone north and turn toward the bearing shown.</p>
+ </div>
+</section>
+</main>
+
+<nav class="fixed bottom-0 inset-x-0 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 z-50">
+ <div class="max-w-5xl mx-auto flex justify-around py-2" id="nav"></div>
+</nav>
+
+<script>
+const $=id=>document.getElementById(id);
+const store={get(k,d){try{const v=JSON.parse(localStorage.getItem(k));return v??d}catch{return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch{}}};
+const icons=()=>lucide.createIcons();
+
+/* ---------- theme ---------- */
+function applyTheme(d){document.documentElement.classList.toggle('dark',d);document.querySelector('meta[name=theme-color]').content=d?'#022c22':'#0f5132'}
+applyTheme(store.get('dark',matchMedia('(prefers-color-scheme: dark)').matches));
+$('theme').onclick=()=>{const d=!document.documentElement.classList.contains('dark');applyTheme(d);store.set('dark',d)};
+
+/* ---------- tabs ---------- */
+const TABS=[['today','layout-dashboard','Today'],['quran','book','Quran'],['duas','heart-handshake','Duas'],['tasbih','disc','Tasbih'],['qibla','compass','Qibla']];
+$('nav').innerHTML=TABS.map(([id,ic,l])=>`<button data-t="${id}" onclick="go('${id}')" class="nav flex flex-col items-center p-1.5 text-xs font-medium w-16"><i data-lucide="${ic}" class="w-5 h-5 mb-0.5"></i>${l}</button>`).join('');
+function go(t){
+  document.querySelectorAll('.tab').forEach(e=>e.classList.add('hidden'));$('tab-'+t).classList.remove('hidden');
+  document.querySelectorAll('.nav').forEach(b=>{const on=b.dataset.t===t;b.classList.toggle('text-emerald-800',on);b.classList.toggle('dark:text-emerald-400',on);b.classList.toggle('text-slate-500',!on)});
+  if(t==='quran')loadSurahs(); if(location.hash!=='#'+t)history.replaceState(null,'','#'+t); scrollTo(0,0);
+}
+
+/* ---------- location ---------- */
+let pos=store.get('pos',{lat:12.9716,lng:77.5946,name:'Bengaluru, India'});
+function locate(){
+  $('loc').textContent=pos.name;
+  if(!navigator.geolocation){return init()}
+  navigator.geolocation.getCurrentPosition(async p=>{
+    pos={lat:p.coords.latitude,lng:p.coords.longitude,name:pos.name};
+    try{const r=await(await fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${pos.lat}&longitude=${pos.lng}&localityLanguage=en`)).json();
+      pos.name=[r.city||r.locality,r.countryName].filter(Boolean).join(', ')||pos.name}catch{}
+    store.set('pos',pos);$('loc').textContent=pos.name;init();
+  },init,{timeout:8000,maximumAge:3600000});
+}
+
+/* ---------- prayer times ---------- */
+const NAMES=['Fajr','Dhuhr','Asr','Maghrib','Isha'];let times=null,nextIdx=-1;
+const fmt=d=>d.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
+async function loadTimes(){
+  const n=new Date(),key=`pt:${n.toDateString()}:${pos.lat.toFixed(1)},${pos.lng.toFixed(1)}`;let data=store.get(key,null);
+  if(!data){try{const r=await fetch(`https://api.aladhan.com/v1/timings/${n.getDate()}-${n.getMonth()+1}-${n.getFullYear()}?latitude=${pos.lat}&longitude=${pos.lng}&method=1`);data=(await r.json()).data;store.set(key,data)}catch{}}
+  if(!data){const m=$('pt-msg');m.textContent='Prayer times unavailable. Connect to the internet once to load today\u2019s times.';m.classList.remove('hidden');return}
+  times=NAMES.map(k=>{const[h,m]=data.timings[k].slice(0,5).split(':');const d=new Date();d.setHours(+h,+m,0,0);return d});
+  const hj=data.date.hijri;$('hijri').textContent=`${hj.day} ${hj.month.en} ${hj.year} AH`;
+  $('prayers').innerHTML=times.map((t,i)=>`<div id="p${i}" class="p-3 rounded-xl border"><p class="text-sm">${NAMES[i]}</p><p class="text-sm sm:text-base font-semibold mt-1">${fmt(t)}</p></div>`).join('');
+  nextIdx=-1;tick();
+}
+function tick(){
+  if(!times)return;const now=new Date();let i=times.findIndex(t=>t>now),target;
+  if(i<0){i=0;target=new Date(times[0].getTime()+864e5)}else target=times[i];
+  if(i!==nextIdx){nextIdx=i;$('np-name').textContent=NAMES[i];$('np-time').textContent=`(${fmt(times[i])})`;
+    NAMES.forEach((_,j)=>{$('p'+j).className='p-3 rounded-xl border '+(j===i?'bg-amber-500/25 border-amber-400/70 text-amber-300 font-bold':'bg-emerald-900/30 border-emerald-600/40')})}
+  const s=Math.max(0,Math.floor((target-now)/1e3)),p=v=>String(v).padStart(2,'0');
+  $('count').textContent=`${p(Math.floor(s/3600))}:${p(Math.floor(s%3600/60))}:${p(s%60)}`;
+  if(now.getDate()!==tickDay){tickDay=now.getDate();loadTimes()}
+}
+let tickDay=new Date().getDate();setInterval(tick,1000);
+$('greg').textContent=new Date().toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'short',year:'numeric'});
+
+/* ---------- ayah of the day ---------- */
+const AYAT=[
+ {r:'Surah Ash-Sharh (94:5-6)',ar:'فَإِنَّ مَعَ الْعُسْرِ يُسْرًا ۝ إِنَّ مَعَ الْعُسْرِ يُسْرًا',tr:'Fa inna ma\u2019al usri yusra. Inna ma\u2019al usri yusra.',en:'For indeed, with hardship [will be] ease. Indeed, with hardship [will be] ease.',re:'Notice how Allah mentions ease twice. Difficulties are temporary, and divine relief always accompanies every trial.'},
+ {r:'Surah Ar-Ra\u2019d (13:28)',ar:'أَلَا بِذِكْرِ اللَّهِ تَطْمَئِنُّ الْقُلُوبُ',tr:'Ala bi dhikrillahi tatma\u2019innul-qulub.',en:'Unquestionably, by the remembrance of Allah hearts are assured.',re:'Calm is not found in having everything settled, but in remembering who is in control.'},
+ {r:'Surah Al-Baqarah (2:153)',ar:'إِنَّ اللَّهَ مَعَ الصَّابِرِينَ',tr:'Inna Allaha ma\u2019as-sabirin.',en:'Indeed, Allah is with the patient.',re:'Patience is never lonely. Allah\u2019s company is promised to those who hold on.'},
+ {r:'Surah At-Talaq (65:3)',ar:'وَمَن يَتَوَكَّلْ عَلَى اللَّهِ فَهُوَ حَسْبُهُ',tr:'Wa man yatawakkal \u2019alallahi fahuwa hasbuh.',en:'And whoever relies upon Allah \u2013 then He is sufficient for him.',re:'Do your part, then place the outcome in Allah\u2019s hands.'},
+ {r:'Surah Al-Baqarah (2:286)',ar:'لَا يُكَلِّفُ اللَّهُ نَفْسًا إِلَّا وُسْعَهَا',tr:'La yukallifullahu nafsan illa wus\u2019aha.',en:'Allah does not charge a soul except [with that within] its capacity.',re:'Whatever you are carrying, you were given the strength for it.'}];
+const a=AYAT[Math.floor(Date.now()/864e5)%AYAT.length];
+$('ay-ref').textContent=a.r;$('ay-ar').textContent=a.ar;$('ay-tr').textContent='\u201C'+a.tr+'\u201D';$('ay-en').textContent='\u201C'+a.en+'\u201D';$('ay-re').textContent=a.re;
+
+/* ---------- articles ---------- */
+const ARTS=[['Peace & Anxiety','emerald','Overcoming Stress Through Dhikr','Discover how remembrance calms the human heart in light of Surah Ar-Ra\u2019d.','Surah Ar-Ra\u2019d (13:28) says hearts find rest in the remembrance of Allah. Start small: a few minutes of tasbih after each prayer, and say Bismillah before tasks that worry you.'],
+ ['Patience','amber','The Concept of Sabr Jameel','Understanding beautiful patience during life\u2019s severe tests.','Sabr Jameel is patience without complaint to people. Prophet Yaqub (AS) said \u201Cfa sabrun jamil\u201D (12:18) and turned his sorrow to Allah alone.']];
+$('articles').innerHTML=ARTS.map(([c,col,t,d,body],i)=>`<button onclick="this.querySelector('.more').classList.toggle('hidden')" class="text-left p-5 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 hover:shadow-md transition"><span class="text-xs font-bold px-2.5 py-1 rounded bg-${col}-100 text-${col}-800 dark:bg-${col}-950 dark:text-${col}-300">${c}</span><h4 class="font-bold text-lg mt-3">${t}</h4><p class="text-slate-500 dark:text-slate-400 mt-1">${d}</p><p class="more hidden mt-3 text-sm text-slate-700 dark:text-slate-300 border-t border-slate-100 dark:border-slate-800 pt-3">${body}</p></button>`).join('');
+// tailwind CDN needs literal classes for dynamic colors:
+void 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300';
+
+/* ---------- Quran (alquran.cloud + islamic.network audio) ---------- */
+let surahs=[],fs=store.get('fs',28),audio=null,bm=store.get('bm',{});
+async function loadSurahs(){
+  if(surahs.length)return;
+  surahs=store.get('surahs',[]);
+  if(!surahs.length){try{surahs=(await(await fetch('https://api.alquran.cloud/v1/surah')).json()).data;store.set('surahs',surahs)}catch{$('surah-list').innerHTML='<p class="text-sm text-slate-500">Could not load the surah list. Check your connection and reopen this tab.</p>';return}}
+  renderSurahs();
+}
+function renderSurahs(){
+  const q=$('q-search').value.trim().toLowerCase();
+  $('surah-list').innerHTML=surahs.filter(s=>!q||String(s.number)===q||s.englishName.toLowerCase().includes(q)||s.englishNameTranslation.toLowerCase().includes(q)).map(s=>`<button onclick="openSurah(${s.number})" class="p-3 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 flex items-center justify-between text-left hover:border-emerald-600 transition"><div class="flex items-center gap-3"><div class="w-9 h-9 rounded-lg bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300 font-bold text-xs flex items-center justify-center">${s.number}</div><div><h4 class="font-bold text-sm">${s.englishName}</h4><p class="text-xs text-slate-500">${s.englishNameTranslation} \u2022 ${s.numberOfAyahs} verses</p></div></div><span class="font-arabic text-xl text-emerald-800 dark:text-emerald-400">${s.name.replace('سُورَةُ ','')}</span></button>`).join('');
+}
+$('q-search').oninput=renderSurahs;
+async function openSurah(n){
+  stopAudio();$('q-list-view').classList.add('hidden');$('q-read').classList.remove('hidden');scrollTo(0,0);
+  const s=surahs.find(x=>x.number===n);$('s-title').textContent=`${n}. ${s.englishName}`;$('q-read').dataset.n=n;
+  $('verses').innerHTML='<p class="text-sm text-slate-500">Loading\u2026</p>';
+  try{
+    const k='surah'+n;let d=store.get(k,null);
+    if(!d){d=(await(await fetch(`https://api.alquran.cloud/v1/surah/${n}/editions/quran-uthmani,en.transliteration,en.sahih`)).json()).data;if(d[0].ayahs.length<400)store.set(k,d)}
+    $('verses').innerHTML=d[0].ayahs.map((v,i)=>{const id=n+':'+v.numberInSurah;return `<div class="p-4 bg-slate-50 dark:bg-slate-950/60 rounded-xl space-y-2 border border-slate-100 dark:border-slate-800"><div class="flex items-center justify-between text-xs text-emerald-700 dark:text-emerald-400 font-bold"><span>${id}</span><button onclick="toggleBm('${id}',this)" class="p-1 ${bm[id]?'text-amber-500':''}" aria-label="Bookmark"><i data-lucide="bookmark" class="w-4 h-4"></i></button></div><p class="text-right font-arabic leading-[2.2] ar-text" dir="rtl" style="font-size:${fs}px">${v.text}</p><p class="text-sm italic text-slate-600 dark:text-slate-400">${d[1].ayahs[i].text}</p><p class="text-sm">${d[2].ayahs[i].text}</p></div>`}).join('');
+    icons();
+  }catch{$('verses').innerHTML='<p class="text-sm text-slate-500">Could not load this surah. Check your connection and try again.</p>'}
+}
+function closeSurah(){stopAudio();$('q-read').classList.add('hidden');$('q-list-view').classList.remove('hidden')}
+function fontSize(d){fs=Math.max(18,Math.min(48,fs+d*2));store.set('fs',fs);document.querySelectorAll('.ar-text').forEach(e=>e.style.fontSize=fs+'px')}
+function toggleBm(id,b){bm[id]=!bm[id];if(!bm[id])delete bm[id];store.set('bm',bm);b.classList.toggle('text-amber-500',!!bm[id])}
+function setAudioIcon(p){$('audio-btn').innerHTML=`<i data-lucide="${p?'pause':'play'}" class="w-4 h-4"></i>`;icons()}
+function stopAudio(){if(audio){audio.pause();audio=null}setAudioIcon(false)}
+function toggleAudio(){
+  if(audio){stopAudio();return}
+  audio=new Audio(`https://cdn.islamic.network/quran/audio-surah/128/ar.alafasy/${$('q-read').dataset.n}.mp3`);
+  audio.onended=stopAudio;audio.onerror=()=>{stopAudio();alert('Audio could not be loaded. Check your connection.')};audio.play();setAudioIcon(true);
+}
+
+/* ---------- duas ---------- */
+const DUAS=[
+ ['sun','amber','Morning & Evening Protection','بِسْمِ اللهِ الَّذِي لاَ يَضُرُّ مَعَ اسْمِهِ شَيْءٌ فِي الأَرْضِ وَلاَ فِي السَّمَاءِ وَهُوَ السَّمِيعُ الْعَلِيمُ','Bismillahil-ladhi la yadurru ma\u2019asmihi shai\u2019un fil-ardi wa la fis-sama\u2019i wa Huwas-Sami\u2019ul-\u2019Alim.','In the Name of Allah with Whose Name nothing can cause harm in the earth nor in the heaven, and He is the All-Hearing, the All-Knowing. (Recite 3 times)'],
+ ['compass','emerald','Guidance & Patience','رَبَّنَا أَفْرِغْ عَلَيْنَا صَبْرًا وَثَبِّتْ أَقْدَامَنَا','Rabbana afrigh \u2019alayna sabran wa thabbit aqdamana.','Our Lord, pour upon us patience and plant firmly our feet. (Surah Al-Baqarah 2:250)'],
+ ['heart','red','Seeking Forgiveness (Istighfar)','أَسْتَغْفِرُ اللهَ الَّذِي لاَ إِلَهَ إِلاَّ هُوَ الْحَيُّ الْقَيُّومُ وَأَتُوبُ إِلَيْهِ','Astaghfirullahal-ladhi la ilaha illa Huwal-Hayyul-Qayyumu wa atubu ilayh.','I seek forgiveness from Allah, besides Whom there is no deity, the Ever-Living, the Sustainer, and I repent to Him.']];
+$('duas').innerHTML=DUAS.map(([ic,c,t,ar,tr,en])=>`<div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden"><button onclick="this.nextElementSibling.classList.toggle('hidden')" class="w-full p-4 flex items-center justify-between font-semibold text-left"><span class="flex items-center gap-2"><i data-lucide="${ic}" class="w-5 h-5 text-${c}-500"></i>${t}</span><i data-lucide="chevron-down" class="w-4 h-4 text-slate-400"></i></button><div class="hidden p-4 bg-slate-50 dark:bg-slate-950 border-t border-slate-100 dark:border-slate-800 space-y-3"><p class="text-right font-arabic text-2xl leading-loose" dir="rtl">${ar}</p><p class="text-sm italic text-slate-600 dark:text-slate-400">${tr}</p><p class="text-sm">${en}</p></div></div>`).join('');
+void 'text-amber-500 text-emerald-500 text-red-500';
+
+/* ---------- tasbih ---------- */
+const DHIKR=[['SubhanAllah','سُبْحَانَ اللَّهِ',33],['Alhamdulillah','الْحَمْدُ لِلَّهِ',33],['Allahu Akbar','اللَّهُ أَكْبَرُ',34],['Astaghfirullah','أَسْتَغْفِرُ اللَّهَ',100],['Free count','',0]];
+let T=store.get('tasbih',{i:0,c:0});
+function renderTasbih(){
+  const[n,ar,tg]=DHIKR[T.i];$('t-ar').textContent=ar;$('t-count').textContent=T.c;
+  $('t-target').textContent=tg?`${n} \u2022 Target ${tg}`:n;$('t-bar').style.width=tg?Math.min(100,T.c/tg*100)+'%':'0';
+  $('dhikr-chips').innerHTML=DHIKR.map(([n],i)=>`<button onclick="setDhikr(${i})" class="px-3 py-1.5 rounded-full font-medium ${i===T.i?'bg-emerald-800 text-white':'bg-slate-100 dark:bg-slate-800'}">${n}</button>`).join('');
+}
+function tap(){T.c++;store.set('tasbih',T);renderTasbih();const tg=DHIKR[T.i][2];if(navigator.vibrate)navigator.vibrate(tg&&T.c===tg?[120,60,120]:25)}
+function resetTasbih(){T.c=0;store.set('tasbih',T);renderTasbih()}
+function setDhikr(i){T={i,c:0};store.set('tasbih',T);renderTasbih()}
+
+/* ---------- qibla ---------- */
+let bearing=0,heading=0;
+function calcQibla(){
+  const r=Math.PI/180,k=[21.4225*r,39.8262*r],p=pos.lat*r,dl=k[1]-pos.lng*r;
+  bearing=(Math.atan2(Math.sin(dl)*Math.cos(k[0]),Math.cos(p)*Math.sin(k[0])-Math.sin(p)*Math.cos(k[0])*Math.cos(dl))/r+360)%360;
+  const dir=['N','NE','E','SE','S','SW','W','NW'][Math.round(bearing/45)%8];
+  $('q-deg').textContent=`${Math.round(bearing)}\u00B0 ${dir}`;drawCompass();
+}
+function drawCompass(){$('dial').style.transform=`rotate(${-heading}deg)`;$('needle').style.transform=`rotate(${bearing}deg)`}
+async function startCompass(){
+  try{if(window.DeviceOrientationEvent&&DeviceOrientationEvent.requestPermission&&await DeviceOrientationEvent.requestPermission()!=='granted')throw 0;
+    const h=e=>{const v=e.webkitCompassHeading??(e.alpha!=null?360-e.alpha:null);if(v!=null){heading=v;drawCompass()}};
+    addEventListener('deviceorientationabsolute',h,true);addEventListener('deviceorientation',h,true);
+    $('compass-btn').classList.add('hidden');$('q-note').textContent='Hold your phone flat. The Kaaba icon points toward Qibla.';
+  }catch{$('q-note').textContent='Compass access was denied or is not available on this device.'}
+}
+
+/* ---------- PWA ---------- */
+let deferred;addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferred=e;$('install').classList.remove('hidden')});
+$('install').onclick=async()=>{if(!deferred)return;deferred.prompt();await deferred.userChoice;deferred=null;$('install').classList.add('hidden')};
+if('serviceWorker'in navigator)addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
+
+/* ---------- boot ---------- */
+let booted=false;
+function init(){if(booted)return;booted=true;calcQibla();loadTimes()}
+renderTasbih();icons();
+go(TABS.some(t=>t[0]===location.hash.slice(1))?location.hash.slice(1):'today');
+locate();
+</script>
+</body>
+</html>
